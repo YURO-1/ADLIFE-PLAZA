@@ -1,66 +1,64 @@
 package org.example;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
 public class Patient {
-    private final StringProperty id;
-    private final StringProperty name;
-    private final StringProperty dob;
-    private final StringProperty status;
+    private String firstname;
+    private String lastname;
+    private String dob;
+    private String status;
 
-    public Patient(String id, String name, String dob, String status) {
-        this(id, name, dob);
-    }
-
-    public Patient(String id, String name, String dob) {
-        this.id = new SimpleStringProperty(id);
-        this.name = new SimpleStringProperty(name);
-        this.dob = new SimpleStringProperty(dob);
-        this.status = new SimpleStringProperty("Waiting");
+    public Patient(String firstname, String lastname, String dob) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.dob = dob;
+        this.status = "Waiting"; // default
     }
 
-    // ID
-    public String getId() {
-        return id.get();
-    }
-    public void setId(String value) {
-        id.set(value);
-    }
-    public StringProperty idProperty() {
-        return id;
+    public Patient(String firstname, String lastname, String dob, String status) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.dob = dob;
+        this.status = status;
     }
 
-    // Name
-    public String getName() {
-        return name.get();
-    }
-    public void setName(String value) {
-        name.set(value);
-    }
-    public StringProperty nameProperty() {
-        return name;
+    // Getters
+    public String getFirstname() {
+        return firstname;
     }
 
-    // DOB
+    public String getLastname() {
+        return lastname;
+    }
+
     public String getDob() {
-        return dob.get();
-    }
-    public void setDob(String value) {
-        dob.set(value);
-    }
-    public StringProperty dobProperty() {
         return dob;
     }
 
-    // Status
     public String getStatus() {
-        return status.get();
-    }
-    public void setStatus(String value) {
-        status.set(value);
-    }
-    public StringProperty statusProperty() {
         return status;
+    }
+
+    public String getName() {
+        return firstname + " " + lastname;
+    }
+
+    // Setters
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    // CSV Conversion
+    public String toCSV() {
+        return firstname + "," + lastname + "," + dob + "," + status;
+    }
+
+    public static Patient fromCSV(String csvLine) {
+        String[] parts = csvLine.split(",");
+        if (parts.length < 4) return null;
+        return new Patient(parts[0], parts[1], parts[2], parts[3]);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (" + dob + ")";
     }
 }

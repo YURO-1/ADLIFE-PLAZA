@@ -1,108 +1,106 @@
 package org.example.Server;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.file.*;
-import java.util.*;
+import java.net.*;
+import java.util.concurrent.*;
 
 public class DoctorServer {
-    private static final int PORT = 12345;
-    private static final String QUEUE_CSV = "/CSV/doctor_queue.csv";
-    private static final String HISTORY_CSV = "/CSV/medical_history.csv";
+
+    private static final int PORT = 5555;
+    private static final File QUEUE_FILE = new File("src/main/resources/CSV/doctor_queue.csv");
+    private static final File HISTORY_FILE = new File("src/main/resources/CSV/medical_history.csv");
 
     public static void main(String[] args) {
+        ExecutorService pool = Executors.newCachedThreadPool();
+
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Doctor server started on port " + PORT);
+            System.out.println("Doctor Server started on port " + PORT);
 
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("Doctor connected: " + clientSocket.getInetAddress());
-                new Thread(() -> handleClient(clientSocket)).start();
+                Socket client = serverSocket.accept();
+                pool.execute(new DoctorClientHandler(client));
             }
         } catch (IOException e) {
-            System.err.println("Server error: " + e.getMessage());
+            e.printStackTrace();
         }
+
+        pool.shutdown();
     }
 
-    private static void handleClient(Socket socket) {
-        try (
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)
-        ) {
-            String request;
-            while ((request = reader.readLine()) != null) {
-                if (request.equals("GET_QUEUE")) {
-                    sendQueue(writer);
-                } else if (request.startsWith("GET_DETAILS:")) {
-                    String name = request.substring("GET_DETAILS:".length());
-                    sendPatientDetails(writer, name);
-                } else if (request.startsWith("GET_HISTORY:")) {
-                    String name = request.substring("GET_HISTORY:".length());
-                    sendHistory(writer, name);
-                } else if (request.startsWith("SAVE_HISTORY:")) {
-                    String[] parts = request.split(":", 4);
-                    if (parts.length == 4) {
-                        String name = parts[1];
-                        String doctor = parts[2];
-                        String history = parts[3];
-                        saveHistory(name, doctor, history);
-                        writer.println("SAVED");
-                    } else {
-                        writer.println("ERROR: Invalid save request");
+    static class DoctorClientHandler implements Runnable {
+        private Socket socket;
+
+        public DoctorClientHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try (
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))
+            ) {
+                String request;
+
+                while ((request = reader.readLine()) != null) {
+                    System.out.println("Request: " + request);
+                    String[] tokens = request.split("::");
+
+                    switch (tokens[0]) {
+                        case "GET_QUEUE":
+                            writer.write(readFile(QUEUE_FILE));
+                            writer.newLine();
+                            writer.flush();
+                            break;
+
+                        case "UPDATE_QUEUE":
+                            writeFile(QUEUE_FILE, tokens[1]);
+                            writer.write("QUEUE_UPDATED");
+                            writer.newLine();
+                            writer.flush();
+                            break;
+
+                        case "SAVE_HISTORY":
+                            appendToFile(HISTORY_FILE, tokens[1]);
+                            writer.write("HISTORY_SAVED");
+                            writer.newLine();
+                            writer.flush();
+                            break;
+
+                        default:
+                            writer.write("UNKNOWN_COMMAND");
+                            writer.newLine();
+                            writer.flush();
+                            break;
                     }
-                } else {
-                    writer.println("UNKNOWN_COMMAND");
+                }
+            } catch (IOException e) {
+                System.err.println("Connection error: " + e.getMessage());
+            }
+        }
+
+        private String readFile(File file) throws IOException {
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line).append(";;");
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Client connection closed.");
+            return sb.toString();
         }
-    }
 
-    private static void sendQueue(PrintWriter writer) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(QUEUE_CSV));
-        for (String line : lines) {
-            writer.println(line);
-        }
-        writer.println("END_QUEUE");
-    }
-
-    private static void sendPatientDetails(PrintWriter writer, String fullName) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(QUEUE_CSV));
-        for (String line : lines) {
-            if (line.contains(fullName)) {
-                writer.println("Details: " + line);
-                return;
+        private void writeFile(File file, String content) throws IOException {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write(content.replace(";;", System.lineSeparator()));
             }
         }
-        writer.println("Details not found.");
-    }
 
-    private static void sendHistory(PrintWriter writer, String fullName) throws IOException {
-        Path path = Paths.get(HISTORY_CSV);
-        if (!Files.exists(path)) {
-            writer.println("No history found.");
-            writer.println("END_HISTORY");
-            return;
-        }
-
-        List<String> lines = Files.readAllLines(path);
-        for (String line : lines) {
-            if (line.startsWith(fullName + ",")) {
-                writer.println(line);
+        private void appendToFile(File file, String line) throws IOException {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+                writer.write(line);
+                writer.newLine();
             }
-        }
-        writer.println("END_HISTORY");
-    }
-
-    private static void saveHistory(String name, String doctor, String notes) {
-        String entry = name + "," + doctor + "," + notes.replace("\n", " ");
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(HISTORY_CSV), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
-            writer.write(entry);
-            writer.newLine();
-        } catch (IOException e) {
-            System.err.println("Failed to save history: " + e.getMessage());
         }
     }
 }

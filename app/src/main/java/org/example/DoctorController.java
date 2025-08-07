@@ -2,111 +2,102 @@ package org.example;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import org.example.DoctorSocket;
-
-import java.io.IOException;
+import javafx.scene.input.MouseEvent;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class DoctorController {
 
-    @FXML private Label welcomeLabel;
-    @FXML private TableView<Patient> queueTable;
-    @FXML private TableColumn<Patient, String> patientNameColumn;
-    @FXML private TableColumn<Patient, String> dobColumn;
-    @FXML private TableColumn<Patient, String> statusColumn;
-    @FXML private Label patientDetailsLabel;
-    @FXML private TextArea medicalHistoryArea;
+    @FXML
+    private Label welcomeLabel;
 
-    private DoctorSocket client;
-    public void initClient(DoctorSocket client) {
-    this.client = client;
-}
+    @FXML
+    private TableView<Patient> queueTable;
 
-    private String doctorId;
-    private Patient selectedPatient;
+    @FXML
+    private TableColumn<Patient, String> patientNameColumn;
 
+    @FXML
+    private TableColumn<Patient, String> dobColumn;
+
+    @FXML
+    private TableColumn<Patient, String> statusColumn;
+
+    @FXML
+    private Label patientDetailsLabel;
+
+    @FXML
+    private TextArea medicalHistoryArea;
+
+    @FXML
+    private Button beginConsultationButton;
+
+    @FXML
+    private Button saveHistoryButton;
+
+    private ObservableList<Patient> patientQueue = FXCollections.observableArrayList();
+
+    private Patient currentPatient = null;
+
+    @FXML
     public void initialize() {
-        // Set up table columns
-        patientNameColumn.setCellValueFactory(data -> data.getValue().nameProperty());
-        dobColumn.setCellValueFactory(data -> data.getValue().dobProperty());
-        statusColumn.setCellValueFactory(data -> data.getValue().statusProperty());
-    }
+        // Configure table columns
+        patientNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        dobColumn.setCellValueFactory(new PropertyValueFactory<>("dob"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-    public void setDoctorInfo(String doctorId) {
-        this.doctorId = doctorId;
-        welcomeLabel.setText("Welcome " + doctorId);
+        // Load dummy data (replace this with CSV/socket loading)
+        patientQueue.addAll(
+            new Patient("John Doe", "1990-05-12", "Waiting"),
+            new Patient("Jane Smith", "1985-09-22", "Waiting"),
+            new Patient("Mark Thomas", "2000-03-17", "Waiting")
+        );
 
-        try {
-            client = new DoctorSocket("localhost", 12345); // Connect to shared server
-            loadQueue();
-        } catch (IOException e) {
-            showAlert("Connection Error", "Could not connect to server.");
-        }
-    }
+        queueTable.setItems(patientQueue);
 
-    /** Load queue from server */
-    private void loadQueue() {
-        queueTable.getItems().clear();
-        try {
-            client.getPatientQueue(line -> {
-                // line = first_name,last_name,dob,registration_date
-                String[] cols = line.split(",");
-                if (cols.length >= 3) {
-                    String fullName = cols[0] + " " + cols[1];
-                    String dob = cols[2];
-                    queueTable.getItems().add(new Patient(fullName, dob, "Waiting"));
-                }
-            });
-        } catch (IOException e) {
-            showAlert("Error", "Could not load patient queue.");
-        }
+        // Handle patient selection
+        queueTable.setOnMouseClicked((MouseEvent event) -> {
+            currentPatient = queueTable.getSelectionModel().getSelectedItem();
+            if (currentPatient != null) {
+                patientDetailsLabel.setText("Patient: " + currentPatient.getName() + " | DOB: " + currentPatient.getDob());
+                medicalHistoryArea.setText(""); // Optionally load history here
+            }
+        });
     }
 
     @FXML
     private void handleBeginConsultation() {
-        selectedPatient = queueTable.getSelectionModel().getSelectedItem();
-        if (selectedPatient == null) {
-            showAlert("No patient selected", "Please select a patient first.");
-            return;
-        }
-
-        try {
-            // Load patient details
-            String details = client.getPatientDetails(selectedPatient.getName());
-            patientDetailsLabel.setText(details);
-
-            // Load history if allowed
-            client.getMedicalHistory(selectedPatient.getName(), historyLine -> {
-                medicalHistoryArea.appendText(historyLine + "\n");
-            });
-
-        } catch (IOException e) {
-            showAlert("Error", "Could not retrieve patient details/history.");
+        currentPatient = queueTable.getSelectionModel().getSelectedItem();
+        if (currentPatient != null) {
+            currentPatient.setStatus("In Consultation");
+            queueTable.refresh();
+            patientDetailsLabel.setText("Patient: " + currentPatient.getName() + " | DOB: " + currentPatient.getDob());
+        } else {
+            showAlert("Please select a patient to begin consultation.");
         }
     }
 
     @FXML
     private void handleSaveHistory() {
-        if (selectedPatient == null) {
-            showAlert("No patient selected", "Please select a patient first.");
-            return;
+        if (currentPatient != null && !medicalHistoryArea.getText().isEmpty()) {
+            // You'd typically save this to a file or server
+            System.out.println("Saving history for " + currentPatient.getName() + ": " + medicalHistoryArea.getText());
+            showAlert("Medical history saved.");
+        } else {
+            showAlert("Select a patient and enter some medical history first.");
         }
-        String history = medicalHistoryArea.getText();
-        client.saveMedicalHistory(selectedPatient.getName(), doctorId, history);
-        showAlert("Saved", "Medical history saved successfully.");
     }
 
     @FXML
     private void handleLogout() {
-        try {
-            if (client != null) client.close();
-        } catch (IOException ignored) {}
-        ((Stage) welcomeLabel.getScene().getWindow()).close();
+        System.exit(0);
     }
 
-    private void showAlert(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK);
-        alert.setTitle(title);
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
         alert.showAndWait();
     }
 }

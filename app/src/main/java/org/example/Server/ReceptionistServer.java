@@ -1,130 +1,72 @@
-package org.example.Server;
+package org.example.server;
 
 import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.function.Consumer;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.Executors;
 
 public class ReceptionistServer {
-    private final String patientFile = "/CSV/patients.csv";
-    private final String queueFile = "/CSV/doctor_queue.csv";
+    private static final int PORT = 6000;
+    private static final String PATIENTS_CSV = "src/main/resources/CSV/patients.csv";
+    private static final String QUEUE_CSV = "src/main/resources/CSV/doctor_queue.csv";
 
-    public ReceptionistServer() {
-        ensureFilesExist();
-    }
 
-    private void ensureFilesExist() {
-        try {
-            Files.createDirectories(Paths.get("CSV"));
-            if (!Files.exists(Paths.get(patientFile))) {
-                Files.createFile(Paths.get(patientFile));
-            }
-            if (!Files.exists(Paths.get(queueFile))) {
-                Files.createFile(Paths.get(queueFile));
+    public static void main(String[] args) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Receptionist Server running on port " + PORT);
+            var pool = Executors.newCachedThreadPool();
+
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                pool.execute(() -> handleClient(clientSocket));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public synchronized void addPatient(String firstName, String lastName, String dob, String regDate) throws IOException {
-        String newEntry = String.join(",", firstName, lastName, dob, regDate);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(patientFile, true))) {
-            writer.write(newEntry);
-            writer.newLine();
-        }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(queueFile, true))) {
-            writer.write(newEntry);
-            writer.newLine();
-        }
-    }
+    private static synchronized void handleClient(Socket socket) {
+        try (
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))
+        ) {
+            String command = in.readLine();
 
-    public synchronized String searchPatient(String term) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(patientFile));
-        for (String line : lines) {
-            if (line.toLowerCase().contains(term.toLowerCase())) {
-                return line;
-            }
-        }
-        return null;
-    }
+            if ("register_patient".equals(command)) {
+                String firstName = in.readLine();
+                String lastName = in.readLine();
+                String dob = in.readLine();
+                String regDate = in.readLine();
 
-    public synchronized void getPatientQueue(Consumer<String> callback) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(queueFile));
-        for (String line : lines) {
-            callback.accept(line);
-        }
-    }
+                String patientEntry = firstName + "," + lastName + "," + dob + "," + regDate;
+                String queueEntry = firstName + " " + lastName + ",Waiting";
 
-    public synchronized void removeFromQueue(String fullName) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(queueFile));
-        List<String> updated = new ArrayList<>();
-        for (String line : lines) {
-            String[] parts = line.split(",");
-            if (parts.length >= 2) {
-                String name = parts[0] + " " + parts[1];
-                if (!name.equalsIgnoreCase(fullName)) {
-                    updated.add(line);
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(PATIENTS_CSV, true))) {
+                    writer.write(patientEntry + "\n");
                 }
-            }
-        }
-        Files.write(Paths.get(queueFile), updated);
-    }
 
-    public synchronized void markAsSeen(String fullName) throws IOException {
-        removeFromQueue(fullName);
-    }
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(QUEUE_CSV, true))) {
+                    writer.write(queueEntry + "\n");
+                }
 
-    // ------------------ Main Method for Testing ------------------
-    public static void main(String[] args) {
-        ReceptionistServer server = new ReceptionistServer();
-        Scanner scanner = new Scanner(System.in);
+                out.write("SUCCESS\n");
+                out.flush();
 
-        try {
-            System.out.println("1. Add Patient");
-            System.out.println("2. Search Patient");
-            System.out.println("3. View Queue");
-            System.out.println("4. Remove from Queue");
-            System.out.println("5. Mark as Seen");
-            System.out.print("Choose an option: ");
-            int option = Integer.parseInt(scanner.nextLine());
+            } else if ("search_patient".equals(command)) {
+                String keyword = in.readLine();
+                StringBuilder result = new StringBuilder();
 
-            switch (option) {
-                case 1 -> {
-                    System.out.print("First Name: ");
-                    String fn = scanner.nextLine();
-                    System.out.print("Last Name: ");
-                    String ln = scanner.nextLine();
-                    System.out.print("DOB (yyyy-mm-dd): ");
-                    String dob = scanner.nextLine();
-                    System.out.print("Reg Date (yyyy-mm-dd): ");
-                    String reg = scanner.nextLine();
-                    server.addPatient(fn, ln, dob, reg);
-                    System.out.println("✅ Patient added.");
+                try (BufferedReader reader = new BufferedReader(new FileReader(PATIENTS_CSV))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.toLowerCase().contains(keyword.toLowerCase())) {
+                            result.append(line).append("\n");
+                        }
+                    }
                 }
-                case 2 -> {
-                    System.out.print("Search Term: ");
-                    String term = scanner.nextLine();
-                    String result = server.searchPatient(term);
-                    System.out.println((result != null) ? "Found: " + result : "❌ No match found.");
-                }
-                case 3 -> {
-                    System.out.println("👥 Patient Queue:");
-                    server.getPatientQueue(line -> System.out.println("• " + line));
-                }
-                case 4 -> {
-                    System.out.print("Full name to remove (e.g., John Doe): ");
-                    String name = scanner.nextLine();
-                    server.removeFromQueue(name);
-                    System.out.println("🗑️ Removed from queue.");
-                }
-                case 5 -> {
-                    System.out.print("Full name to mark as seen: ");
-                    String name = scanner.nextLine();
-                    server.markAsSeen(name);
-                    System.out.println("✅ Marked as seen.");
-                }
-                default -> System.out.println("❌ Invalid option.");
+
+                out.write(result.toString().isEmpty() ? "No results\n" : result.toString());
+                out.flush();
             }
 
         } catch (IOException e) {
