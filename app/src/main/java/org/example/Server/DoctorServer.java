@@ -7,8 +7,8 @@ import java.util.concurrent.*;
 public class DoctorServer {
 
     private static final int PORT = 5555;
-    private static final File QUEUE_FILE = new File("src/main/resources/CSV/doctor_queue.csv");
-    private static final File HISTORY_FILE = new File("src/main/resources/CSV/medical_history.csv");
+    private static final File QUEUE_FILE = new File("app/src/main/resources/CSV/doctor_queue.csv");
+    private static final File HISTORY_FILE = new File("app/src/main/resources/CSV/medical_history.csv");
 
     public static void main(String[] args) {
         ExecutorService pool = Executors.newCachedThreadPool();
@@ -67,6 +67,25 @@ public class DoctorServer {
                             writer.flush();
                             break;
 
+                        case "BEGIN_CONSULTATION":
+                            String patientName = tokens[1];
+                            if (updatePatientStatus(patientName, "In Consultation")) {
+                                writer.write("CONSULTATION_STARTED");
+                            } else {
+                                writer.write("FAILED");
+                            }
+                            writer.newLine();
+                            writer.flush();
+                            break;
+
+                        case "GET_HISTORY":
+                            String patient = tokens[1];
+                            String history = getPatientHistory(patient);
+                            writer.write(history);
+                            writer.newLine();
+                            writer.flush();
+                            break;
+
                         default:
                             writer.write("UNKNOWN_COMMAND");
                             writer.newLine();
@@ -101,6 +120,44 @@ public class DoctorServer {
                 writer.write(line);
                 writer.newLine();
             }
+        }
+
+        private boolean updatePatientStatus(String patientName, String newStatus) throws IOException {
+            File tempFile = new File(QUEUE_FILE.getAbsolutePath() + ".tmp");
+            boolean found = false;
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(QUEUE_FILE));
+                 BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+                
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith(patientName + ",")) {
+                        writer.write(patientName + "," + newStatus + "\n");
+                        found = true;
+                    } else {
+                        writer.write(line + "\n");
+                    }
+                }
+            }
+
+            if (found) {
+                tempFile.renameTo(QUEUE_FILE);
+                return true;
+            }
+            return false;
+        }
+
+        private String getPatientHistory(String patientName) throws IOException {
+            StringBuilder history = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new FileReader(HISTORY_FILE))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith(patientName + "::")) {
+                        history.append(line.substring(line.indexOf("::") + 2)).append("\n");
+                    }
+                }
+            }
+            return history.toString().isEmpty() ? "No medical history found for " + patientName : history.toString();
         }
     }
 }

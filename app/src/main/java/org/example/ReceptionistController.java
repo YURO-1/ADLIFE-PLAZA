@@ -26,37 +26,44 @@ public class ReceptionistController {
     @FXML private Button markSeenButton;
 
     private final ObservableList<PatientQueueItem> queueData = FXCollections.observableArrayList();
+    private final ReceptionistSocket socketClient = new ReceptionistSocket("localhost", 6000);
 
     @FXML
     public void initialize() {
-        patientNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        patientNameColumn.setCellValueFactory(new PropertyValueFactory<>("patientName"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // Initialize with dummy or empty data
+        // Initialize with dummy data for demonstration
+        queueData.add(new PatientQueueItem("John Doe", "Waiting"));
+        queueData.add(new PatientQueueItem("Jane Smith", "In Consultation"));
+        queueData.add(new PatientQueueItem("Bob Johnson", "Seen"));
+        
         queueTable.setItems(queueData);
+        
+        // Set default dates
+        regDatePicker.setValue(java.time.LocalDate.now());
     }
 
     @FXML
     private void handleRegisterPatient() {
-        String firstName = firstNameField.getText();
-        String lastName = lastNameField.getText();
+        String firstName = firstNameField.getText().trim();
+        String lastName = lastNameField.getText().trim();
         String dob = (dobPicker.getValue() != null) ? dobPicker.getValue().toString() : "";
         String regDate = (regDatePicker.getValue() != null) ? regDatePicker.getValue().toString() : "";
 
-        if (firstName.isEmpty() || lastName.isEmpty() || dob.isEmpty() || regDate.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "All fields are required.");
+        if (firstName.isEmpty() || lastName.isEmpty() || dob.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Please fill in all required fields (First Name, Last Name, Date of Birth).");
             return;
         }
 
-        ReceptionistSocket socketClient = new ReceptionistSocket("localhost", 6000);
         boolean success = socketClient.registerPatient(firstName, lastName, dob, regDate);
 
         if (success) {
-            showAlert(Alert.AlertType.INFORMATION, "Patient registered and added to queue.");
+            showAlert(Alert.AlertType.INFORMATION, "Patient registered successfully and added to queue.");
             queueData.add(new PatientQueueItem(firstName + " " + lastName, "Waiting"));
             clearFields();
         } else {
-            showAlert(Alert.AlertType.ERROR, "Registration failed.");
+            showAlert(Alert.AlertType.ERROR, "Registration failed. Please try again.");
         }
     }
 
@@ -64,34 +71,50 @@ public class ReceptionistController {
     private void handleSearchPatient() {
         String keyword = searchField.getText().trim();
         if (keyword.isEmpty()) {
-            searchResultLabel.setText("Please enter a name.");
+            searchResultLabel.setText("Please enter a name or keyword to search.");
             return;
         }
 
-        ReceptionistSocket socketClient = new ReceptionistSocket("localhost", 6000);
         String result = socketClient.searchPatient(keyword);
-
         searchResultLabel.setText(result);
     }
 
     @FXML
     private void handleRemoveFromQueue() {
         PatientQueueItem selected = queueTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Please select a patient to remove from the queue.");
+            return;
+        }
+
+        String patientName = selected.getPatientName();
+        boolean success = socketClient.removeFromQueue(patientName);
+        
+        if (success) {
             queueData.remove(selected);
+            showAlert(Alert.AlertType.INFORMATION, "Patient removed from queue successfully.");
         } else {
-            showAlert(Alert.AlertType.WARNING, "Please select a patient to remove.");
+            showAlert(Alert.AlertType.ERROR, "Failed to remove patient from queue.");
         }
     }
 
     @FXML
     private void handleMarkAsSeen() {
         PatientQueueItem selected = queueTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Please select a patient to mark as seen.");
+            return;
+        }
+
+        String patientName = selected.getPatientName();
+        boolean success = socketClient.markAsSeen(patientName);
+        
+        if (success) {
             selected.setStatus("Seen");
             queueTable.refresh();
+            showAlert(Alert.AlertType.INFORMATION, "Patient marked as seen successfully.");
         } else {
-            showAlert(Alert.AlertType.WARNING, "Please select a patient to mark as seen.");
+            showAlert(Alert.AlertType.ERROR, "Failed to mark patient as seen.");
         }
     }
 
@@ -99,35 +122,14 @@ public class ReceptionistController {
         firstNameField.clear();
         lastNameField.clear();
         dobPicker.setValue(null);
-        regDatePicker.setValue(null);
+        regDatePicker.setValue(java.time.LocalDate.now());
     }
 
     private void showAlert(Alert.AlertType type, String message) {
         Alert alert = new Alert(type);
+        alert.setTitle("ADLIFE PLAZA");
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    // Inner class to represent each row in the queue table
-    public static class PatientQueueItem {
-        private final String name;
-        private String status;
-
-        public PatientQueueItem(String name, String status) {
-            this.name = name;
-            this.status = status;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
     }
 }

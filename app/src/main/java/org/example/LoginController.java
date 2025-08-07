@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -21,6 +22,9 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
+    @FXML
+    private Label statusLabel;
+
     // Change these to your server host/port
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 5000;
@@ -31,7 +35,8 @@ public class LoginController {
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            showAlert("Error", "Please enter username and password.");
+            statusLabel.setText("Please enter username and password.");
+            statusLabel.setStyle("-fx-text-fill: #e74c3c;");
             return;
         }
 
@@ -50,11 +55,13 @@ public class LoginController {
             } else if (username.startsWith("#dct")) {
                 loadDashboard("/FXML/DoctorDashboard.fxml", "Doctor Dashboard");
             } else {
-                showAlert("Error", "Invalid username format. Must start with #rcp or #dct.");
+                statusLabel.setText("Invalid username format. Must start with #rcp or #dct.");
+                statusLabel.setStyle("-fx-text-fill: #e74c3c;");
             }
 
         } catch (IOException e) {
-            showAlert("Error", "Could not connect to server.");
+            statusLabel.setText("Could not connect to server. Please try again.");
+            statusLabel.setStyle("-fx-text-fill: #e74c3c;");
             e.printStackTrace();
         }
     }

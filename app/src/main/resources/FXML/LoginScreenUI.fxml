@@ -7,34 +7,66 @@
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.LoginController"
-            style="-fx-background-color: #b3d9ff;"> <!-- Light Blue Background -->
+            stylesheets="@../Styles/modern-theme.css">
 
-    <!-- Center Box -->
     <center>
-        <VBox spacing="20" alignment="CENTER">
-            <!-- Title -->
-            <Label  fx:id="statusLabel" text="ADLIFE PLAZA" 
-                   style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-underline: true; -fx-text-fill: #003366;" />
-
-            <!-- Motto -->
-            <Label text="&quot;Linking patients to world class doctors worldwide&quot;"
-                   style="-fx-font-size: 16px; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: #004080;" />
-
-            <!-- Login Form -->
+        <VBox spacing="0" alignment="CENTER" styleClass="container" maxWidth="400">
+            <padding>
+                <Insets top="40" bottom="40" left="40" right="40"/>
+            </padding>
+            
+            <!-- Logo/Brand Section -->
             <VBox spacing="15" alignment="CENTER">
-                <TextField fx:id="usernameField" promptText="Username" maxWidth="250"/>
-                <PasswordField fx:id="passwordField" promptText="Password" maxWidth="250"/>
-                <Button text="Login"
-        fx:id="loginButton"
-        onAction="#handleLogin"
-        style="-fx-background-color: #00aaff; -fx-text-fill: white;"/>
-
+                <Label text="🏥" style="-fx-font-size: 48px; -fx-padding: 0 0 10 0;"/>
+                <Label text="ADLIFE PLAZA" styleClass="title" alignment="CENTER"/>
+                <Label text="Linking patients to world class doctors worldwide" 
+                       styleClass="subtitle" alignment="CENTER" 
+                       style="-fx-font-style: italic; -fx-text-fill: #667eea;"/>
+            </VBox>
+            
+            <Separator styleClass="separator" style="-fx-padding: 30 0;"/>
+            
+            <!-- Login Form -->
+            <VBox spacing="20" alignment="CENTER">
+                <Label text="Sign In" styleClass="section-title" alignment="CENTER"/>
+                
+                <VBox spacing="15" alignment="CENTER">
+                    <TextField fx:id="usernameField" 
+                              promptText="Enter your username" 
+                              styleClass="text-field"
+                              maxWidth="300"/>
+                    
+                    <PasswordField fx:id="passwordField" 
+                                  promptText="Enter your password" 
+                                  styleClass="password-field"
+                                  maxWidth="300"/>
+                    
+                    <Button text="Sign In" 
+                            fx:id="loginButton"
+                            onAction="#handleLogin"
+                            styleClass="btn-primary"
+                            maxWidth="300"/>
+                </VBox>
+                
+                <!-- Status Label -->
+                <Label fx:id="statusLabel" 
+                       text="" 
+                       styleClass="info-label" 
+                       alignment="CENTER"
+                       style="-fx-text-alignment: center; -fx-wrap-text: true;"/>
+            </VBox>
+            
+            <!-- Footer -->
+            <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20 0 0 0;">
+                <Label text="Secure Medical Management System" 
+                       styleClass="body-text" 
+                       alignment="CENTER"
+                       style="-fx-text-fill: #95a5a6;"/>
+                <Label text="© 2024 ADLIFE PLAZA" 
+                       styleClass="body-text" 
+                       alignment="CENTER"
+                       style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;"/>
             </VBox>
         </VBox>
     </center>
-
-    <!-- Add some padding -->
-    <padding>
-        <Insets top="50" bottom="50" left="50" right="50"/>
-    </padding>
 </BorderPane>

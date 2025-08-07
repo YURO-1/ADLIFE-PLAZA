@@ -1,0 +1,268 @@
+/* Modern Theme for ADLIFE PLAZA Medical System */
+
+/* Root Styles */
+.root {
+    -fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -fx-font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Common Styles */
+.container {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 5);
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 2);
+    -fx-padding: 20;
+}
+
+/* Typography */
+.title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.subtitle {
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #34495e;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 10 0 5 0;
+}
+
+.body-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #5a6c7d;
+}
+
+/* Buttons */
+.btn-primary {
+    -fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-font-size: 14px;
+    -fx-background-radius: 25;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.3), 5, 0, 0, 2);
+}
+
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.4), 8, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: linear-gradient(135deg, #4a5fc6 0%, #5a3380 100%);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.btn-secondary {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: 600;
+    -fx-font-size: 14px;
+    -fx-background-radius: 25;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 25;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #d5dbdb;
+    -fx-border-color: #95a5a6;
+}
+
+.btn-danger {
+    -fx-background-color: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-font-size: 14px;
+    -fx-background-radius: 25;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+}
+
+.btn-success {
+    -fx-background-color: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-font-size: 14px;
+    -fx-background-radius: 25;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.btn-success:hover {
+    -fx-background-color: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+}
+
+/* Form Controls */
+.text-field, .password-field {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8;
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #6c757d;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.2), 3, 0, 0, 1);
+}
+
+.date-picker {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8;
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.date-picker:focused {
+    -fx-background-color: white;
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+/* Table Views */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: 600;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 12 8;
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f8f9fa;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #1976d2;
+}
+
+/* Text Areas */
+.text-area {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8;
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 12;
+    -fx-font-size: 14px;
+}
+
+.text-area:focused {
+    -fx-background-color: white;
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+}
+
+/* Labels */
+.status-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 8 0;
+}
+
+.info-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6c757d;
+    -fx-padding: 4 0;
+}
+
+/* Separators */
+.separator {
+    -fx-background-color: #e9ecef;
+    -fx-padding: 0 0 1 0;
+}
+
+/* Scroll Bars */
+.scroll-bar {
+    -fx-background-color: #f8f9fa;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #95a5a6;
+}
+
+/* Animations */
+.fade-in {
+    -fx-opacity: 0;
+    -fx-animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from { -fx-opacity: 0; }
+    to { -fx-opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .title {
+        -fx-font-size: 24px;
+    }
+    
+    .subtitle {
+        -fx-font-size: 16px;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-danger, .btn-success {
+        -fx-padding: 10 20;
+        -fx-font-size: 13px;
+    }
+}

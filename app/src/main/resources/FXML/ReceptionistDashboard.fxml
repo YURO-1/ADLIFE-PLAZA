@@ -7,117 +7,127 @@
 <?import javafx.scene.text.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.ReceptionistController"
-            style="-fx-background-color: #70c1f0;">
-    <top>
-        <VBox alignment="CENTER">
-            <Label text="Receptionist Dashboard">
-                <font>
-                    <Font name="Arial Bold Italic" size="24" />
-                </font>
-                <padding>
-                    <Insets top="20" right="20" bottom="10" left="20"/>
-                </padding>
-                <style>
-                    -fx-text-fill: black;
-                </style>
-            </Label>
+            stylesheets="@../Styles/modern-theme.css" prefWidth="1200" prefHeight="800">
 
-            <Label text="Welcome Nurse Mary">
-                <font>
-                    <Font name="Arial Italic" size="18" />
-                </font>
-                <padding>
-                    <Insets bottom="20"/>
-                </padding>
-                <style>
-                    -fx-text-fill: black;
-                </style>
-            </Label>
+    <!-- Header -->
+    <top>
+        <VBox styleClass="container" style="-fx-background-radius: 0 0 15 15;">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="👩‍⚕️" style="-fx-font-size: 32px;"/>
+                <VBox spacing="5">
+                    <Label text="Receptionist Dashboard" styleClass="title"/>
+                    <Label text="Welcome, Nurse Mary" styleClass="subtitle" style="-fx-text-fill: #667eea;"/>
+                </VBox>
+            </HBox>
         </VBox>
     </top>
 
+    <!-- Main Content -->
     <center>
-        <GridPane hgap="15" vgap="15" alignment="TOP_CENTER">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-
-            <columnConstraints>
-                <ColumnConstraints halignment="CENTER" />
-                <ColumnConstraints halignment="CENTER" />
-            </columnConstraints>
-
-            <!-- Register Patient -->
-            <Label text="Register Patient" style="-fx-font-style: italic; -fx-font-weight: bold;"
-                   GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" />
-
-            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                <ImageView fitHeight="24" fitWidth="24">
-                    <image>
-                        <Image url="@../images/user_icon.png" />
-                    </image>
-                </ImageView>
-                <TextField fx:id="firstNameField" promptText="First Name" />
-            </HBox>
-
-            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                <ImageView fitHeight="24" fitWidth="24">
-                    <image>
-                        <Image url="@../images/user_icon.png" />
-                    </image>
-                </ImageView>
-                <TextField fx:id="lastNameField" promptText="Last Name" />
-            </HBox>
-
-            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                <ImageView fitHeight="24" fitWidth="24">
-                    <image>
-                        <Image url="@../images/calendar_icon.png" />
-                    </image>
-                </ImageView>
-                <DatePicker fx:id="dobPicker" promptText="DOB" />
-                <DatePicker fx:id="regDatePicker" promptText="Registration Date" />
-            </HBox>
-
-            <Button text="Register Patient" fx:id="registerButton"
-                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
-                    onAction="#handleRegisterPatient"
-                    GridPane.columnIndex="0" GridPane.rowIndex="4" />
-
-            <!-- Search Patient -->
-            <Label text="Search Patient" style="-fx-font-style: italic; -fx-font-weight: bold;"
-                   GridPane.columnIndex="0" GridPane.rowIndex="5" />
-
-            <TextField fx:id="searchField" promptText="Search Patient" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-            <Button text="Search Patient" fx:id="searchButton"
-                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
-                    onAction="#handleSearchPatient"
-                    GridPane.columnIndex="0" GridPane.rowIndex="7" />
-
-            <Label fx:id="searchResultLabel" text="[Display Search Results]"
-                   GridPane.columnIndex="0" GridPane.rowIndex="8" />
-
-            <!-- Patient Queue -->
-            <Label text="Dr Adrian's Queue"
-                   style="-fx-font-style: italic; -fx-font-weight: bold;"
-                   GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-            <TableView fx:id="queueTable" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="7">
-                <columns>
-                    <TableColumn fx:id="patientNameColumn" text="Patient Name" prefWidth="150" />
-                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
-                </columns>
-            </TableView>
-
-            <Button text="Remove from Queue" fx:id="removeButton"
-                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
-                    onAction="#handleRemoveFromQueue"
-                    GridPane.columnIndex="1" GridPane.rowIndex="8" />
-
-            <Button text="Mark as Seen" fx:id="markSeenButton"
-                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
-                    onAction="#handleMarkAsSeen"
-                    GridPane.columnIndex="1" GridPane.rowIndex="9" />
-        </GridPane>
+        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox spacing="25" style="-fx-padding: 30;">
+                
+                <!-- Patient Registration Card -->
+                <VBox styleClass="card" spacing="20">
+                    <Label text="📝 Patient Registration" styleClass="section-title"/>
+                    
+                    <GridPane hgap="15" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+                        
+                        <!-- First Name -->
+                        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="First Name" styleClass="body-text"/>
+                            <TextField fx:id="firstNameField" promptText="Enter first name" styleClass="text-field"/>
+                        </VBox>
+                        
+                        <!-- Last Name -->
+                        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Last Name" styleClass="body-text"/>
+                            <TextField fx:id="lastNameField" promptText="Enter last name" styleClass="text-field"/>
+                        </VBox>
+                        
+                        <!-- Date of Birth -->
+                        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Date of Birth" styleClass="body-text"/>
+                            <DatePicker fx:id="dobPicker" styleClass="date-picker"/>
+                        </VBox>
+                        
+                        <!-- Registration Date -->
+                        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Registration Date" styleClass="body-text"/>
+                            <DatePicker fx:id="regDatePicker" styleClass="date-picker"/>
+                        </VBox>
+                        
+                        <!-- Register Button -->
+                        <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                            <Button text="Register Patient" 
+                                    fx:id="registerButton"
+                                    onAction="#handleRegisterPatient"
+                                    styleClass="btn-success"/>
+                        </HBox>
+                    </GridPane>
+                </VBox>
+                
+                <!-- Patient Search Card -->
+                <VBox styleClass="card" spacing="20">
+                    <Label text="🔍 Patient Search" styleClass="section-title"/>
+                    
+                    <VBox spacing="15">
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <TextField fx:id="searchField" 
+                                      promptText="Search by name or ID" 
+                                      styleClass="text-field"
+                                      HBox.hgrow="ALWAYS"/>
+                            <Button text="Search" 
+                                    fx:id="searchButton"
+                                    onAction="#handleSearchPatient"
+                                    styleClass="btn-primary"/>
+                        </HBox>
+                        
+                        <VBox styleClass="card" style="-fx-background-color: #f8f9fa; -fx-padding: 15;">
+                            <Label fx:id="searchResultLabel" 
+                                   text="Search results will appear here..." 
+                                   styleClass="info-label"
+                                   style="-fx-text-alignment: center; -fx-wrap-text: true;"/>
+                        </VBox>
+                    </VBox>
+                </VBox>
+                
+                <!-- Patient Queue Card -->
+                <VBox styleClass="card" spacing="20">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="👥" style="-fx-font-size: 20px;"/>
+                        <Label text="Dr. Adrian's Patient Queue" styleClass="section-title"/>
+                    </HBox>
+                    
+                    <VBox spacing="15">
+                        <TableView fx:id="queueTable" styleClass="table-view" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="patientNameColumn" text="Patient Name" prefWidth="200"/>
+                                <TableColumn fx:id="statusColumn" text="Status" prefWidth="150"/>
+                            </columns>
+                        </TableView>
+                        
+                        <HBox spacing="15" alignment="CENTER_RIGHT">
+                            <Button text="Remove from Queue" 
+                                    fx:id="removeButton"
+                                    onAction="#handleRemoveFromQueue"
+                                    styleClass="btn-danger"/>
+                            <Button text="Mark as Seen" 
+                                    fx:id="markSeenButton"
+                                    onAction="#handleMarkAsSeen"
+                                    styleClass="btn-secondary"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

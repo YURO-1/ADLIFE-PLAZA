@@ -6,63 +6,102 @@
 <?import javafx.scene.text.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.DoctorController"
-            prefWidth="1000" prefHeight="700" style="-fx-background-color: #70c1f0;">
+            stylesheets="@../Styles/modern-theme.css" prefWidth="1400" prefHeight="900">
 
+    <!-- Header -->
     <top>
-        <VBox alignment="CENTER">
-            <Label text="Doctor Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-            <Label fx:id="welcomeLabel" text="Welcome Doctor" style="-fx-font-size: 18px;"/>
-            <Separator/>
+        <VBox styleClass="container" style="-fx-background-radius: 0 0 15 15;">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="👨‍⚕️" style="-fx-font-size: 32px;"/>
+                <VBox spacing="5">
+                    <Label text="Doctor Dashboard" styleClass="title"/>
+                    <Label fx:id="welcomeLabel" text="Welcome, Doctor" styleClass="subtitle" style="-fx-text-fill: #667eea;"/>
+                </VBox>
+            </HBox>
         </VBox>
     </top>
 
+    <!-- Main Content -->
     <center>
-        <GridPane hgap="20" vgap="20" alignment="TOP_CENTER">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-            <columnConstraints>
-                <ColumnConstraints percentWidth="50"/>
-                <ColumnConstraints percentWidth="50"/>
-            </columnConstraints>
-
-            <!-- Patient Queue -->
-            <Label text="Patient Queue" style="-fx-font-size: 18px; -fx-font-weight: bold;"
-                   GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-
-            <TableView fx:id="queueTable" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="5">
-                <columns>
-                    <TableColumn fx:id="patientNameColumn" text="Patient Name" prefWidth="200"/>
-                    <TableColumn fx:id="dobColumn" text="DOB" prefWidth="150"/>
-                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
-                </columns>
-            </TableView>
-
-            <Button text="Begin Consultation" fx:id="beginConsultationButton"
-                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
-                    GridPane.columnIndex="0" GridPane.rowIndex="6" onAction="#handleBeginConsultation"/>
-
-            <!-- Consultation Section -->
-            <Label text="Patient Details &amp; Medical History" style="-fx-font-size: 18px; -fx-font-weight: bold;"
-                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-            <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                <Label fx:id="patientDetailsLabel" text="[Select a patient to view details]"/>
-                <TextArea fx:id="medicalHistoryArea" promptText="Enter medical history here..."
-                          prefRowCount="10" wrapText="true"/>
-                <Button text="Save History" fx:id="saveHistoryButton"
-                        style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
-                        onAction="#handleSaveHistory"/>
+        <HBox spacing="25" style="-fx-padding: 30;">
+            
+            <!-- Left Column - Patient Queue -->
+            <VBox styleClass="card" spacing="20" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="👥" style="-fx-font-size: 20px;"/>
+                    <Label text="Patient Queue" styleClass="section-title"/>
+                </HBox>
+                
+                <VBox spacing="15" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="queueTable" styleClass="table-view" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="patientNameColumn" text="Patient Name" prefWidth="200"/>
+                            <TableColumn fx:id="dobColumn" text="Date of Birth" prefWidth="150"/>
+                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
+                        </columns>
+                    </TableView>
+                    
+                    <HBox alignment="CENTER" spacing="15">
+                        <Button text="Begin Consultation" 
+                                fx:id="beginConsultationButton"
+                                onAction="#handleBeginConsultation"
+                                styleClass="btn-primary"/>
+                    </HBox>
+                </VBox>
             </VBox>
-        </GridPane>
+            
+            <!-- Right Column - Patient Details & Medical History -->
+            <VBox styleClass="card" spacing="20" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="📋" style="-fx-font-size: 20px;"/>
+                    <Label text="Patient Details & Medical History" styleClass="section-title"/>
+                </HBox>
+                
+                <VBox spacing="20" VBox.vgrow="ALWAYS">
+                    <!-- Patient Details Section -->
+                    <VBox spacing="10">
+                        <Label text="Patient Information" styleClass="body-text" style="-fx-font-weight: 600;"/>
+                        <VBox styleClass="card" style="-fx-background-color: #f8f9fa; -fx-padding: 15;">
+                            <Label fx:id="patientDetailsLabel" 
+                                   text="Select a patient from the queue to view details" 
+                                   styleClass="info-label"
+                                   style="-fx-text-alignment: center; -fx-wrap-text: true;"/>
+                        </VBox>
+                    </VBox>
+                    
+                    <!-- Medical History Section -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS">
+                        <Label text="Medical History" styleClass="body-text" style="-fx-font-weight: 600;"/>
+                        <TextArea fx:id="medicalHistoryArea" 
+                                 promptText="Enter medical history, diagnosis, and treatment notes here..."
+                                 styleClass="text-area"
+                                 VBox.vgrow="ALWAYS"
+                                 wrapText="true"/>
+                    </VBox>
+                    
+                    <!-- Action Buttons -->
+                    <HBox spacing="15" alignment="CENTER_RIGHT">
+                        <Button text="Clear History" 
+                                styleClass="btn-secondary"/>
+                        <Button text="Save History" 
+                                fx:id="saveHistoryButton"
+                                onAction="#handleSaveHistory"
+                                styleClass="btn-success"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </HBox>
     </center>
 
+    <!-- Footer -->
     <bottom>
-        <HBox alignment="CENTER_RIGHT">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-            <Button text="Logout" style="-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 20;"
+        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 20 30;">
+            <Button text="Logout" 
+                    styleClass="btn-danger"
                     onAction="#handleLogout"/>
         </HBox>
     </bottom>
