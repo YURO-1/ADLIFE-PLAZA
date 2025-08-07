@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.LoginController"
+            style="-fx-background-color: #b3d9ff;"> <!-- Light Blue Background -->
+
+    <!-- Center Box -->
+    <center>
+        <VBox spacing="20" alignment="CENTER">
+            <!-- Title -->
+            <Label  fx:id="statusLabel" text="ADLIFE PLAZA" 
+                   style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-underline: true; -fx-text-fill: #003366;" />
+
+            <!-- Motto -->
+            <Label text="&quot;Linking patients to world class doctors worldwide&quot;"
+                   style="-fx-font-size: 16px; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: #004080;" />
+
+            <!-- Login Form -->
+            <VBox spacing="15" alignment="CENTER">
+                <TextField fx:id="usernameField" promptText="Username" maxWidth="250"/>
+                <PasswordField fx:id="passwordField" promptText="Password" maxWidth="250"/>
+                <Button text="Login"
+        fx:id="loginButton"
+        onAction="#handleLogin"
+        style="-fx-background-color: #00aaff; -fx-text-fill: white;"/>
+
+            </VBox>
+        </VBox>
+    </center>
+
+    <!-- Add some padding -->
+    <padding>
+        <Insets top="50" bottom="50" left="50" right="50"/>
+    </padding>
+</BorderPane>

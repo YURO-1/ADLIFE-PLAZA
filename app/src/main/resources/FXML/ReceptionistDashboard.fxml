@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.ReceptionistController"
+            style="-fx-background-color: #70c1f0;">
+    <top>
+        <VBox alignment="CENTER">
+            <Label text="Receptionist Dashboard">
+                <font>
+                    <Font name="Arial Bold Italic" size="24" />
+                </font>
+                <padding>
+                    <Insets top="20" right="20" bottom="10" left="20"/>
+                </padding>
+                <style>
+                    -fx-text-fill: black;
+                </style>
+            </Label>
+
+            <Label text="Welcome Nurse Mary">
+                <font>
+                    <Font name="Arial Italic" size="18" />
+                </font>
+                <padding>
+                    <Insets bottom="20"/>
+                </padding>
+                <style>
+                    -fx-text-fill: black;
+                </style>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <GridPane hgap="15" vgap="15" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" />
+                <ColumnConstraints halignment="CENTER" />
+            </columnConstraints>
+
+            <!-- Register Patient -->
+            <Label text="Register Patient" style="-fx-font-style: italic; -fx-font-weight: bold;"
+                   GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+
+            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <ImageView fitHeight="24" fitWidth="24">
+                    <image>
+                        <Image url="@../images/user_icon.png" />
+                    </image>
+                </ImageView>
+                <TextField fx:id="firstNameField" promptText="First Name" />
+            </HBox>
+
+            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                <ImageView fitHeight="24" fitWidth="24">
+                    <image>
+                        <Image url="@../images/user_icon.png" />
+                    </image>
+                </ImageView>
+                <TextField fx:id="lastNameField" promptText="Last Name" />
+            </HBox>
+
+            <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                <ImageView fitHeight="24" fitWidth="24">
+                    <image>
+                        <Image url="@../images/calendar_icon.png" />
+                    </image>
+                </ImageView>
+                <DatePicker fx:id="dobPicker" promptText="DOB" />
+                <DatePicker fx:id="regDatePicker" promptText="Registration Date" />
+            </HBox>
+
+            <Button text="Register Patient" fx:id="registerButton"
+                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
+                    onAction="#handleRegisterPatient"
+                    GridPane.columnIndex="0" GridPane.rowIndex="4" />
+
+            <!-- Search Patient -->
+            <Label text="Search Patient" style="-fx-font-style: italic; -fx-font-weight: bold;"
+                   GridPane.columnIndex="0" GridPane.rowIndex="5" />
+
+            <TextField fx:id="searchField" promptText="Search Patient" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+            <Button text="Search Patient" fx:id="searchButton"
+                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
+                    onAction="#handleSearchPatient"
+                    GridPane.columnIndex="0" GridPane.rowIndex="7" />
+
+            <Label fx:id="searchResultLabel" text="[Display Search Results]"
+                   GridPane.columnIndex="0" GridPane.rowIndex="8" />
+
+            <!-- Patient Queue -->
+            <Label text="Dr Adrian's Queue"
+                   style="-fx-font-style: italic; -fx-font-weight: bold;"
+                   GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <TableView fx:id="queueTable" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="7">
+                <columns>
+                    <TableColumn fx:id="patientNameColumn" text="Patient Name" prefWidth="150" />
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
+                </columns>
+            </TableView>
+
+            <Button text="Remove from Queue" fx:id="removeButton"
+                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
+                    onAction="#handleRemoveFromQueue"
+                    GridPane.columnIndex="1" GridPane.rowIndex="8" />
+
+            <Button text="Mark as Seen" fx:id="markSeenButton"
+                    style="-fx-background-color: #00aaff; -fx-text-fill: white; -fx-background-radius: 20;"
+                    onAction="#handleMarkAsSeen"
+                    GridPane.columnIndex="1" GridPane.rowIndex="9" />
+        </GridPane>
+    </center>
+</BorderPane>
